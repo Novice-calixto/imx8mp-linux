@@ -1,0 +1,124 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Overlay: Waveshare DSI-to-DPI bridge (waveshare,dsi2dpi) + panel-dpi +
+ * GT911 touch. Base dts must have &i2c3, &mipi_dsi, &ldb, &ldb_phy labels.
+ */
+/dts-v1/;
+/plugin/;
+
+#include "imx93-pinfunc.h"
+/ {
+	fragment@0 {
+		target = <&lpi2c1>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			bridge@45 {
+				compatible = "waveshare,dsi2dpi";
+				reg = <0x45>;
+				power-supply = <&reg_vdd_5p0v>;
+
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+
+				port@0 {
+					reg = <0>;
+
+					waveshare_to_dsi: endpoint {
+						data-lanes = <1 2>;
+						remote-endpoint = <&dsi_to_waveshare>;
+					};
+				};
+
+				port@1 {
+					reg = <1>;
+	
+					waveshare_to_panel: endpoint {
+						remote-endpoint = <&panel_to_waveshare>;
+					};
+				};
+			};
+		};
+
+		ft5406: ts@38 {
+			compatible = "edt,edt-ft5506";
+			reg = <0x38>;
+
+			touchscreen-size-x = < 800 >;
+            	        touchscreen-size-y = < 480 >;
+			touchscreen-inverted-x;
+			touchscreen-inverted-y;
+			};
+
+		};
+	};
+
+	/* panel-dpi is board-level, not under any bus - attach to root */
+	fragment@1 {
+		target-path = "/";
+		__overlay__ {
+			panel {
+				compatible = "waveshare,7.0inch-c-panel", "panel-dpi";
+				power-supply = <&reg_vdd_5p0v>;
+				bus-format = <0x100a>;   /* MEDIA_BUS_FMT_RGB888_1X24 */
+
+				port {
+					panel_to_waveshare: endpoint {
+						remote-endpoint = <&waveshare_to_panel>;
+					};
+				};
+
+				panel-timing {
+					clock-frequency = <28030000>;
+					hactive = <800>;
+					vactive = <480>;
+					hfront-porch = <70>;
+					hback-porch = <26>;
+					hsync-len = <20>;
+					vback-porch = <21>;
+					vfront-porch = <7>;
+					vsync-len = <10>;
+
+					hsync-active = <0>;
+					vsync-active = <0>;
+					de-active = <1>;
+					pixelclk-active = <1>;
+				};	
+			};	
+		};
+	};
+
+	fragment@2 {
+		target = <&ldb>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@3 {
+		target = <&ldb_phy>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@4 {
+		target = <&dsi>;
+		__overlay__ {
+			status = "okay";
+			ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+				port@1 {
+					reg = <1>;
+					dsi_to_waveshare: endpoint {
+						remote-endpoint = <&waveshare_to_dsi>;
+					};
+				};
+			};
+		};
+	};
+};
