@@ -258,36 +258,35 @@
 		default-brightness-level = <80>;
 	};
 	
-	lvds0_panel {
-		status = "okay";
-		backlight = <&lvds_backlight>;
-		compatible = "panel-lvds"; 
-		data-mapping = "vesa-24";
-		//enable-gpios = <&gpio2 26 GPIO_ACTIVE_HIGH>;
-		width-mm = <124>;
-		height-mm = <80>;
+	panel {
+    			compatible = "panel-dpi";
+    			power-supply = <&reg_audio_3v3>;
+    			//backlight = <&backlight>;
+    			status = "okay";
+    			
+    			width-mm = <154>;
+        		height-mm = <86>;
 
-		panel-timing {
-			clock-frequency = <25000000>;
-			hactive = <800>;
-			vactive = <480>;
-			hfront-porch = <8>;
-			hback-porch = <8>;
-			hsync-len = <4>;
-			vback-porch = <8>;
-			vfront-porch = <8>;
-			vsync-len = <4>;
-			hsync-active = <0>;
-			vsync-active = <0>;
-			de-active = <1>;
-                	pixelclk-active = <0>;
-		};
+    			port {
+        			panel_to_waveshare: endpoint {
+            			remote-endpoint = <&waveshare_to_panel>;
+        			};
+    			};
+			
+			panel-timing {         
+    				clock-frequency = <30850000>;
+    				hactive = <480>;
+    				vactive = <890>;
+    				hback-porch = <40>;
+    				hfront-porch = <40>;
+    				hsync-len = <10>;
+    				vback-porch = <13>;
+    				vfront-porch = <3>;
+    				vsync-len = <3>;
+    				de-active = <1>;
+    				pixelclk-active = <0>;
+	    		};
 
-		port {
-			panel_lvds_in: endpoint {
-				remote-endpoint = <&lvds_out>;
-			};
-		};
 	};
 	
 	cbtl04gp {
@@ -593,6 +592,44 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c3>;
 	status = "okay";
+	
+	bridge@45 {
+		compatible = "waveshare,dsi2dpi";
+		reg = <0x45>;
+		//power-supply = <&reg_vdd_5p0v>;
+		power-supply = <&reg_audio_3v3>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				waveshare_from_dsim: endpoint {
+					data-lanes = <1 2>;
+					remote-endpoint = <&dsim_to_waveshare>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				waveshare_to_panel: endpoint {
+					remote-endpoint = <&panel_to_waveshare>;
+				};
+			};
+		};
+	};
+
+	gt911: gt911@14 {
+        compatible = "goodix,gt911";
+        reg = <0x14>;
+        touchscreen-size-x = <890>;
+        touchscreen-size-y = <480>;
+        touchscreen-swapped-x-y;
+        touchscreen-inverted-x; 
+    };
 
 };
 
@@ -675,33 +712,18 @@
 };
 
 &ldb {
-	status = "okay";
-	
-	lvds-channel@0 {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		fsl,data-mapping = "spwg";
-		fsl,data-width = <24>;
-		status = "okay";
-
-		port@1 {
-			reg = <1>;
-			lvds_out: endpoint {
-				remote-endpoint = <&panel_lvds_in>;
-			};
-		};
-	};
+	status = "disabled";
 };
 
 &ldb_phy {
-	status = "okay";
+	status = "disabled";
 };
 
 &media_blk_ctrl {
-       assigned-clock-rates = <500000000>, <200000000>,
-                              <0>, <0>, <497700000>; // 71.1MHz
-                               //<0>, <0>, <358400000>; // 51.2MHz
-                              //<0>, <0>, <454970880>; // 64.9Mhz
+	/* currently it is not possible to let IMX8MP_VIDEO_PLL1
+	 * configure automatically, so we need to set it manually
+	 */
+	assigned-clock-rates = <500000000>, <200000000>, <0>, <0>, <400000000>;
 };
 
 &micfil {
@@ -717,7 +739,16 @@
 &mipi_dsi {
 	#address-cells = <1>;
 	#size-cells = <0>;
-	status = "disabled";
+	status = "okay";
+
+        port@1 {
+            reg = <1>;
+            dsim_to_waveshare: endpoint {
+                remote-endpoint = <&waveshare_from_dsim>;
+		attach-bridge;
+		data-lanes = <1 2>;
+            };
+        };
 };
 
 &mu2 {
