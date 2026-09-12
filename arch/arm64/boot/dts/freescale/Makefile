@@ -275,7 +275,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mp-dhcom-pdk2.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-dhcom-pdk3.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-dhcom-picoitx.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-edm-g-wb.dtb
-dtb-$(CONFIG_ARCH_MXC) += imx8mp-calixto-optima_2GB.dtb \
+dtb-$(CONFIG_ARCH_MXC) += imx8mp-calixto-optima_2GB.dtb imx8mp-calixto-optima_4GB.dtb \
                           imx8mp-calixto-optima_2GB-csi2-lvds.dtb imx8mp-calixto-optima_2GB-csi2-mipidsi.dtb \
 			  imx8mp-calixto-optima_2GB-dualcsi-lvds.dtb imx8mp-calixto-optima_2GB-dualcsi-mipidsi.dtb \
 			  imx8mp-calixto-optima_2GB-mipidsi.dtb
