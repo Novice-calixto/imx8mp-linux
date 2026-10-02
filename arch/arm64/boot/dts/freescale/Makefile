@@ -136,7 +136,10 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mp-evk.dtb imx8mp-evk-rm67191.dtb imx8mp-evk-it626
 			  imx8mp-evk-dpdk.dtb imx8mp-evk-8mic-swpdm.dtb imx8mp-evk-rpmsg-lpv.dtb imx8mp-evk-revA3-8mic-revE.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-calixto-optima_2GB.dtb  imx8mp-calixto-optima_2GB-csi2-lvds.dtb \
 			  imx8mp-calixto-optima_2GB-csi2-mipidsi.dtb imx8mp-calixto-optima_2GB-dualcsi-lvds.dtb \
-			  imx8mp-calixto-optima_2GB-dualcsi-mipidsi.dtb imx8mp-calixto-optima_2GB-mipidsi.dtb 
+			  imx8mp-calixto-optima_2GB-dualcsi-mipidsi.dtb imx8mp-calixto-optima_2GB-mipidsi.dtb \
+			  imx8mp-calixto-optima_4GB.dtb  imx8mp-calixto-optima_4GB-csi2-lvds.dtb \
+                          imx8mp-calixto-optima_4GB-csi2-mipidsi.dtb imx8mp-calixto-optima_4GB-dualcsi-lvds.dtb \
+                          imx8mp-calixto-optima_4GB-dualcsi-mipidsi.dtb imx8mp-calixto-optima_4GB-mipidsi.dtb  
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-msc-sm2s-ep1.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-phyboard-pollux-rdk.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8mp-ab2.dtb
