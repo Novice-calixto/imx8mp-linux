@@ -12,7 +12,7 @@
 #include "imx8mp-nxp-capture.dtsi"
 
 / {
-	model = "CALIXTO, i.MX8M PLUS CALIXTO OPTIMA 4GB";
+	model = "NXP i.MX8M PLUS CALIXTO OPTIMA 4GB EVB";
 	compatible = "fsl,imx8mp-calixto-optima-som", "fsl,imx8mp";
 
 	chosen {
@@ -21,9 +21,8 @@
 
 	memory@40000000 {
 		device_type = "memory";
-		
-		reg = <0x0 0x40000000 0 0xC0000000>,
-		      <0x1 0x00000000 0 0x40000000>;
+		reg = <0x0 0x40000000 0x0 0xc0000000>,
+      		      <0x1 0x00000000 0x0 0x40000000>;
 	};
 
 	pcie0_refclk: pcie0-refclk {
@@ -52,58 +51,38 @@
 
 	reg_audio_pwr: regulator-audio-pwr {
 		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_audio_pwr_reg>;
 		regulator-name = "audio-pwr";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio4 29 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
+		regulator-always-on;
+		regulator-boot-on;
 	};
 
 	reg_can1_stby: regulator-can1-stby {
 		compatible = "regulator-fixed";
 		regulator-name = "can1-stby";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_flexcan1_reg>;
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio5 5 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-	};
-
-	reg_can2_stby: regulator-can2-stby {
-		compatible = "regulator-fixed";
-		regulator-name = "can2-stby";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_flexcan2_reg>;
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio4 27 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
+		regulator-always-on;
+		regulator-boot-on;
 	};
 
 	reg_m2_wlan: regulator-wlan {
 		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_reg_wlan>;
 		regulator-name = "WLAN_EN";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio2 6 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
+		regulator-always-on;
+		regulator-boot-on;
 	};
 
 	reg_usb_vbus: regulator-vbus {
 		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_usb1_vbus>;
 		regulator-name = "USB_VBUS";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-		gpio = <&gpio1 14 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-always-on;
+		regulator-always-on;		
+		regulator-boot-on;
 	};
 	
 	reg_usdhc2_vmmc: regulator-usdhc2-vmmc {
@@ -133,29 +112,34 @@
 		regulator-name = "PMIC_USDHC_VSELECT";
 		vin-supply = <&ldo5>;
 	};
-
-	audio_codec_bt_sco: audio-codec-bt-sco {
-		compatible = "linux,bt-sco";
-		#sound-dai-cells = <1>;
+	
+	reg_cam_dovdd: regulator-cam-dovdd {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_csi1>;
+		regulator-name = "CAM_DOVDD";
+		regulator-min-microvolt = <3000000>;
+		regulator-max-microvolt = <3000000>;
+		gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
 	};
-
-	sound-bt-sco {
-		compatible = "simple-audio-card";
-		simple-audio-card,name = "bt-sco-audio";
-		simple-audio-card,format = "dsp_a";
-		simple-audio-card,bitclock-inversion;
-		simple-audio-card,frame-master = <&btcpu>;
-		simple-audio-card,bitclock-master = <&btcpu>;
-
-		btcpu: simple-audio-card,cpu {
-			sound-dai = <&sai2>;
-			dai-tdm-slot-num = <2>;
-			dai-tdm-slot-width = <16>;
-		};
-
-		simple-audio-card,codec {
-			sound-dai = <&audio_codec_bt_sco 1>;
-		};
+	
+	reg_cam_avdd: regulator-cam-avdd {
+		compatible = "regulator-fixed";
+		regulator-name = "CAM_AVDD";
+		regulator-min-microvolt = <2800000>;
+		regulator-max-microvolt = <2800000>;
+		gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+	
+	reg_cam_dvdd: regulator-cam-dvdd {
+		compatible = "regulator-fixed";
+		regulator-name = "CAM_DVDD";
+		regulator-min-microvolt = <1500000>;
+		regulator-max-microvolt = <1500000>;
+		gpio = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
 	};
 
 	sound-hdmi {
@@ -163,53 +147,6 @@
 		model = "audio-hdmi";
 		audio-cpu = <&aud2htx>;
 		hdmi-out;
-	};
-
-	sound-micfil {
-		compatible = "fsl,imx-audio-card";
-		model = "micfil-audio";
-
-		pri-dai-link {
-			link-name = "micfil hifi";
-			format = "i2s";
-
-			cpu {
-				sound-dai = <&micfil>;
-			};
-		};
-	};
-
-	sound-wm8960 {
-		compatible = "fsl,imx-audio-wm8960";
-		audio-asrc = <&easrc>;
-		//audio-codec = <&wm8960>;
-		audio-cpu = <&sai3>;
-		audio-routing = "Headphone Jack", "HP_L",
-			"Headphone Jack", "HP_R",
-			"Ext Spk", "SPK_LP",
-			"Ext Spk", "SPK_LN",
-			"Ext Spk", "SPK_RP",
-			"Ext Spk", "SPK_RN",
-			"LINPUT1", "Mic Jack",
-			"LINPUT3", "Mic Jack",
-			"Mic Jack", "MICB";
-		hp-det-gpio = <&gpio4 28 GPIO_ACTIVE_HIGH>;
-		model = "wm8960-audio";
-		pinctrl-0 = <&pinctrl_hpdet>;
-		pinctrl-names = "default";
-	};
-
-	sound-xcvr {
-		compatible = "fsl,imx-audio-card";
-		model = "imx-audio-xcvr";
-
-		pri-dai-link {
-			link-name = "XCVR PCM";
-
-			cpu {
-				sound-dai = <&xcvr>;
-			};
-		};
 	};
 
 	usdhc1_pwrseq: usdhc1_pwrseq {
@@ -291,19 +228,6 @@
 
 	};
 	
-	cbtl04gp {
-		compatible = "nxp,cbtl04gp";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_typec_mux>;
-		switch-gpios = <&gpio4 20 GPIO_ACTIVE_LOW>;
-		orientation-switch;
-
-		port {
-			usb3_data_ss: endpoint {
-				remote-endpoint = <&typec_con_ss>;
-			};
-		};
-	};
 };
 
 &flexspi {
@@ -406,10 +330,6 @@
 };
 
 &flexcan2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexcan2>;
-	xceiver-supply = <&reg_can2_stby>;
-//	pinctrl-assert-gpios = <&pca6416 3 GPIO_ACTIVE_HIGH>;
 	status = "disabled";/* can2 pin conflict with pdm */
 };
 
@@ -422,10 +342,6 @@
 	pmic@25 {
 		compatible = "nxp,pca9450c";
 		reg = <0x25>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_pmic>;
-		interrupt-parent = <&gpio1>;
-		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
 
 		regulators {
 			buck1: BUCK1 {
@@ -530,13 +446,15 @@
 		compatible = "ovti,ov5640";
 		reg = <0x3c>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_csi0_pwn>, <&pinctrl_csi0_rst>, <&pinctrl_csi_mclk>;
+		pinctrl-0 = <&pinctrl_led_csi1>;
+		DOVDD-supply = <&reg_cam_dovdd>; /* 3.0v */
+              	AVDD-supply = <&reg_cam_avdd>;  /* 2.8v */
+              	DVDD-supply = <&reg_cam_dvdd>;  /* 1.5v */
 		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
 		clock-names = "xclk";
 		assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
 		assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
 		assigned-clock-rates = <24000000>;
-		//powerdown-gpios = <&gpio2 11 GPIO_ACTIVE_HIGH>;
 		status = "okay";
 
 		port {
@@ -548,45 +466,6 @@
 		};
 	};
 
-	ptn5110: tcpc@50 {
-		compatible = "nxp,ptn5110";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_typec>;
-		reg = <0x50>;
-		interrupt-parent = <&gpio4>;
-		interrupts = <19 8>;
-
-		port {
-			typec_dr_sw: endpoint {
-				remote-endpoint = <&usb3_drd_sw>;
-			};
-		};
-
-		usb_con: connector {
-			compatible = "usb-c-connector";
-			label = "USB-C";
-			power-role = "dual";
-			data-role = "dual";
-			try-power-role = "sink";
-			source-pdos = <PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)>;
-			sink-pdos = <PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)
-				     PDO_VAR(5000, 20000, 3000)>;
-			op-sink-microwatt = <15000000>;
-			self-powered;
-
-			ports {
-				#address-cells = <1>;
-				#size-cells = <0>;
-
-				port@1 {
-					reg = <1>;
-					typec_con_ss: endpoint {
-						remote-endpoint = <&usb3_data_ss>;
-					};
-				};
-			};
-		};
-	};
 };
 
 &i2c3 {
@@ -661,14 +540,16 @@
 		compatible = "ovti,ov5640";
 		reg = <0x3c>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_csi2>;
+		pinctrl-0 = <&pinctrl_led_csi2>;
+		//DOVDD-supply = <&reg_cam_dovdd>; /* 3.0v */
+              	//AVDD-supply = <&reg_cam_avdd>;  /* 2.8v */
+              	//DVDD-supply = <&reg_cam_dvdd>;  /* 1.5v */
 		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
 		clock-names = "xclk";
 		assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
 		assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
 		assigned-clock-rates = <24000000>;
 		csi_id = <0>;
-		//powerdown-gpios = <&gpio4 1 GPIO_ACTIVE_HIGH>;
 		mclk = <24000000>;
 		mclk_source = <0>;
 		mipi_csi;
@@ -823,7 +704,7 @@
 	status = "okay";
 };
 
-&uart1 { /* BT */
+&uart1 { 
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
 	status = "okay";
@@ -858,12 +739,6 @@
 	snps,dis-u1-entry-quirk;
 	snps,dis-u2-entry-quirk;
 	status = "okay";
-
-	port {
-		usb3_drd_sw: endpoint {
-			remote-endpoint = <&typec_dr_sw>;
-		};
-	};
 };
 
 &usb3_phy1 {
@@ -1125,10 +1000,16 @@
 		>;
 	};
 
-	pinctrl_pmic: pmicgrp {
+	pinctrl_reg_csi1: regcsi1grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_GPIO1_IO03__GPIO1_IO03	0x000001c0
 		>;
+	};
+	
+	pinctrl_led_csi1: ledcsi1grp {
+    		fsl,pins = <
+        		MX8MP_IOMUXC_GPIO1_IO07__GPIO1_IO07    	0x000001c0
+    		>;
 	};
 
 	pinctrl_pca6416_int: pca6416_int_grp {
@@ -1137,11 +1018,16 @@
 		>;
 	};
 
-	pinctrl_csi2: csi2grp {
+	pinctrl_reg_csi2: csi1grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_GPIO1_IO11__GPIO1_IO11	0x000001c0
-			MX8MP_IOMUXC_GPIO1_IO01__GPIO1_IO01	0x000001c0
 		>;
+	};
+	
+	pinctrl_led_csi2: camledgrp {
+    		fsl,pins = <
+        		MX8MP_IOMUXC_GPIO1_IO01__GPIO1_IO01    	0x000001c0
+    		>;
 	};
 
 	pinctrl_pwm4: pwm4grp {
