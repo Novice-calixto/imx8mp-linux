@@ -6371,11 +6371,12 @@ static void pci_fixup_d3cold_delay_1sec(struct pci_dev *pdev)
 }
 DECLARE_PCI_FIXUP_FINAL(0x5555, 0x0004, pci_fixup_d3cold_delay_1sec);
 
-static void quirk_ara240_class(struct pci_dev *pdev){    
-	 u32 old_class = pdev->class;    
-	 if (pdev->class == 0x000012) { 
-	        pdev->class = PCI_CLASS_PROCESSOR_OTHER << 8; /* 0x120000 */  
-	       dev_info(&pdev->dev,              "ARA240 class corrected: 0x%06x -> 0x%06x\n",              old_class, pdev->class);     } } DECLARE_PCI_FIXUP_EARLY(0x1e58, 0x0002, quirk_ara240_class);
+static void quirk_ara240_class(struct pci_dev *pdev){     
+           u32 old_class = pdev->class;     
+           if (pdev->class == 0x000012) {         
+           pdev->class = 0x120000; /*PCI_CLASS_PROCESSOR_OTHER << 8; /* 0x120000 */         
+           
+           dev_info(&pdev->dev,              "ARA240 class corrected: 0x%06x -> 0x%06x\n",              old_class, pdev->class);     } } DECLARE_PCI_FIXUP_EARLY(0x1e58, 0x0002, quirk_ara240_class);
 
 #ifdef CONFIG_PCIEAER
 static void pci_mask_replay_timer_timeout(struct pci_dev *pdev)
