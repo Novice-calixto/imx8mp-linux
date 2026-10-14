@@ -996,10 +996,10 @@ static int imx_pcie_deassert_core_reset(struct imx_pcie *imx_pcie)
 
 	/* Some boards don't have PCIe reset GPIO. */
 	if (imx_pcie->reset_gpiod) {
-		msleep(100);
+		msleep(300);
 		gpiod_set_value_cansleep(imx_pcie->reset_gpiod, 0);
 		/* Wait for 100ms after PERST# deassertion (PCIe r5.0, 6.6.1) */
-		msleep(100);
+		msleep(500);
 	}
 
 	return 0;
