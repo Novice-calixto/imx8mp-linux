@@ -97,6 +97,47 @@ struct mxc_isi_fmt mxc_isi_out_formats[] = {
 		.colplanes	= 1,
 		.align		= 2,
 		.mbus_code	= MEDIA_BUS_FMT_RGB888_1X24,
+	}, {
+		/*
+		 * RAW Bayer pass-through. 12-bit samples are stored in a
+		 * 16-bit container (ISI RAW16 output, no left shift).
+		 * ISI cannot scale raw: output size must equal sensor size.
+		 */
+		.name		= "RAW12 (SRGGB12)",
+		.fourcc		= V4L2_PIX_FMT_SRGGB12,
+		.depth		= { 16 },
+		.color		= MXC_ISI_OUT_FMT_RAW16,
+		.memplanes	= 1,
+		.colplanes	= 1,
+		.align		= 3,
+		.mbus_code	= MEDIA_BUS_FMT_SRGGB12_1X12,
+	}, {
+		.name		= "RAW12 (SGRBG12)",
+		.fourcc		= V4L2_PIX_FMT_SGRBG12,
+		.depth		= { 16 },
+		.color		= MXC_ISI_OUT_FMT_RAW16,
+		.memplanes	= 1,
+		.colplanes	= 1,
+		.align		= 3,
+		.mbus_code	= MEDIA_BUS_FMT_SGRBG12_1X12,
+	}, {
+		.name		= "RAW12 (SGBRG12)",
+		.fourcc		= V4L2_PIX_FMT_SGBRG12,
+		.depth		= { 16 },
+		.color		= MXC_ISI_OUT_FMT_RAW16,
+		.memplanes	= 1,
+		.colplanes	= 1,
+		.align		= 3,
+		.mbus_code	= MEDIA_BUS_FMT_SGBRG12_1X12,
+	}, {
+		.name		= "RAW12 (SBGGR12)",
+		.fourcc		= V4L2_PIX_FMT_SBGGR12,
+		.depth		= { 16 },
+		.color		= MXC_ISI_OUT_FMT_RAW16,
+		.memplanes	= 1,
+		.colplanes	= 1,
+		.align		= 3,
+		.mbus_code	= MEDIA_BUS_FMT_SBGGR12_1X12,
 	}
 };
 

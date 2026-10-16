@@ -941,6 +941,9 @@ static int mxc_isi_source_fmt_init(struct mxc_isi_cap_dev *isi_cap)
 	struct v4l2_subdev_format src_fmt;
 	struct media_pad *source_pad;
 	struct v4l2_subdev *src_sd;
+	bool raw = dst_f->fmt &&
+		   dst_f->fmt->color >= MXC_ISI_OUT_FMT_RAW8 &&
+		   dst_f->fmt->color <= MXC_ISI_OUT_FMT_RAW16;
 	int ret;
 
 	source_pad = mxc_isi_get_remote_source_pad(&isi_cap->sd);
@@ -956,7 +959,9 @@ static int mxc_isi_source_fmt_init(struct mxc_isi_cap_dev *isi_cap)
 
 	src_fmt.pad = source_pad->index;
 	src_fmt.which = V4L2_SUBDEV_FORMAT_ACTIVE;
-	src_fmt.format.code = MEDIA_BUS_FMT_UYVY8_1X16;
+	/* raw: ask sensor for the bayer code of the requested format */
+	src_fmt.format.code = raw ? dst_f->fmt->mbus_code
+				  : MEDIA_BUS_FMT_UYVY8_1X16;
 	src_fmt.format.width = dst_f->width;
 	src_fmt.format.height = dst_f->height;
 	ret = v4l2_subdev_call(src_sd, pad, set_fmt, NULL, &src_fmt);
@@ -978,6 +983,16 @@ static int mxc_isi_source_fmt_init(struct mxc_isi_cap_dev *isi_cap)
 	src_f->fmt = mxc_isi_get_src_fmt(&src_fmt);
 
 	set_frame_bounds(src_f, src_fmt.format.width, src_fmt.format.height);
+
+	/* ISI cannot scale raw data */
+	if (raw && (dst_f->width != src_f->width ||
+		    dst_f->height != src_f->height)) {
+		dev_err(&isi_cap->pdev->dev,
+			"raw needs 1:1 size: src %dx%d dst %dx%d\n",
+			src_f->width, src_f->height,
+			dst_f->width, dst_f->height);
+		return -EINVAL;
+	}
 
 	if (dst_f->width > src_f->width || dst_f->height > src_f->height) {
 		dev_err(&isi_cap->pdev->dev,
